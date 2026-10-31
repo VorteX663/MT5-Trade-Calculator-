@@ -10,7 +10,7 @@ import android.widget.*;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
-    EditText entry, sl, balance, risk, point, tickSize, tickValue, volumeStep, symbol, broker;
+    EditText entry, sl, balance, risk, point, tickSize, tickValue, volumeStep, symbol;
     RadioGroup side;
     Spinner instrumentType;
     TextView output;
@@ -43,7 +43,6 @@ public class MainActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         instrumentType.setAdapter(adapter); root.addView(instrumentType, params(-1,dp(48),0,0,0,2));
         symbol = addField(root, "Exact broker symbol", "e.g. XAUUSD, EURUSD, US30.cash");
-        broker = addField(root, "Broker / trading server (optional)", "e.g. Exness, IC Markets");
 
         Button search = new Button(this);
         search.setText("SEARCH WEB FOR SYMBOL SPECS");
@@ -75,7 +74,7 @@ public class MainActivity extends Activity {
         calc.setOnClickListener(v -> calculate());
 
         TextView note = new TextView(this);
-        note.setText("Web search opens results in your browser; it does not automatically import values. Tick value, tick size and volume rules are set by each broker and can vary by account currency. Confirm the exact symbol in MT5 before relying on a calculation.");
+        note.setText("Web search opens results in your browser; it does not automatically import values. Tick value, tick size and volume rules are broker- and account-specific. Confirm the exact symbol in MT5 before relying on a calculation.");
         note.setTextColor(Color.LTGRAY); note.setTextSize(12); note.setPadding(0,dp(16),0,0); root.addView(note);
     }
 
@@ -83,8 +82,7 @@ public class MainActivity extends Activity {
         String sym = symbol.getText().toString().trim();
         if (sym.isEmpty()) { symbol.setError("Enter the exact symbol first"); return; }
         String type = instrumentType.getSelectedItem().toString();
-        String br = broker.getText().toString().trim();
-        String query = (br.isEmpty() ? "" : br + " ") + sym + " " + type
+        String query = sym + " " + type
             + " MT5 symbol specification tick value tick size contract size volume step";
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/search?q=" + Uri.encode(query)));
         startActivity(intent);
