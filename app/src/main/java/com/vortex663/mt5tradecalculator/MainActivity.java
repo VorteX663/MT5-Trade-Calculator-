@@ -14,6 +14,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     EditText entry, sl, balance, risk, point, tickSize, tickValue, volumeStep, symbol;
     RadioGroup side;
+    MaterialButton buyButton, sellButton;
     Spinner instrumentType;
     TextView output;
 
@@ -53,9 +54,32 @@ public class MainActivity extends AppCompatActivity {
 
         addLabel(root, "Trade direction");
         side = new RadioGroup(this); side.setOrientation(RadioGroup.HORIZONTAL);
-        RadioButton buy = new RadioButton(this); buy.setText("BUY"); buy.setTextColor(Color.WHITE); buy.setId(View.generateViewId());
-        RadioButton sell = new RadioButton(this); sell.setText("SELL"); sell.setTextColor(Color.WHITE); sell.setId(View.generateViewId());
-        side.addView(buy); side.addView(sell); side.check(buy.getId()); root.addView(side);
+        side.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
+        buyButton = new MaterialButton(this);
+        buyButton.setText("BUY");
+        buyButton.setTextSize(18);
+        buyButton.setTypeface(null, 1);
+        buyButton.setTextColor(Color.WHITE);
+        buyButton.setCornerRadius(dp(22));
+        buyButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(35,145,85)));
+        sellButton = new MaterialButton(this);
+        sellButton.setText("SELL");
+        sellButton.setTextSize(18);
+        sellButton.setTypeface(null, 1);
+        sellButton.setTextColor(Color.WHITE);
+        sellButton.setCornerRadius(dp(22));
+        sellButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(190,55,65)));
+        RadioGroup.LayoutParams tradeButtonParams = new RadioGroup.LayoutParams(0, dp(64), 1f);
+        tradeButtonParams.setMargins(0, dp(4), dp(8), dp(8));
+        side.addView(buyButton, tradeButtonParams);
+        RadioGroup.LayoutParams sellParams = new RadioGroup.LayoutParams(0, dp(64), 1f);
+        sellParams.setMargins(dp(8), dp(4), 0, dp(8));
+        side.addView(sellButton, sellParams);
+        side.check(0);
+        buyButton.setOnClickListener(v -> selectTradeSide(true));
+        sellButton.setOnClickListener(v -> selectTradeSide(false));
+        root.addView(side, params(-1, dp(76), 0, 0, 0, 4));
+        selectTradeSide(true);
 
         entry = addField(root, "Entry price", "e.g. 2350.50");
         sl = addField(root, "Stop loss (MT5 points)", "e.g. 500");
@@ -78,6 +102,16 @@ public class MainActivity extends AppCompatActivity {
         TextView note = new TextView(this);
         note.setText("Web search opens results in your browser; it does not automatically import values. Tick value, tick size and volume rules are broker- and account-specific. Confirm the exact symbol in MT5 before relying on a calculation.");
         note.setTextColor(Color.rgb(190,180,200)); note.setTextSize(12); note.setPadding(0,dp(16),0,0); root.addView(note);
+    }
+
+    void selectTradeSide(boolean isBuy) {
+        side.check(isBuy ? 0 : 1);
+        buyButton.setAlpha(isBuy ? 1.0f : 0.55f);
+        sellButton.setAlpha(isBuy ? 0.55f : 1.0f);
+        buyButton.setStrokeWidth(isBuy ? dp(3) : 0);
+        sellButton.setStrokeWidth(isBuy ? 0 : dp(3));
+        buyButton.setStrokeColor(android.content.res.ColorStateList.valueOf(Color.rgb(170,245,195)));
+        sellButton.setStrokeColor(android.content.res.ColorStateList.valueOf(Color.rgb(255,180,180)));
     }
 
     void searchSpecs() {
@@ -117,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             double ep=val(entry), stop=val(sl), bal=val(balance), rp=val(risk);
             double ps=val(point), ts=val(tickSize), tv=val(tickValue), step=val(volumeStep);
             if(stop<=0||bal<=0||rp<=0||rp>100||ps<=0||ts<=0||tv<=0||step<=0) throw new IllegalArgumentException("Values must be positive; risk must be 100% or less.");
-            boolean isBuy = side.getCheckedRadioButtonId() == side.getChildAt(0).getId();
+            boolean isBuy = side.getCheckedRadioButtonId() == 0;
             double tpPoints=stop*3.0, distance=stop*ps;
             double slPrice=isBuy?ep-distance:ep+distance;
             double tpPrice=isBuy?ep+tpPoints*ps:ep-tpPoints*ps;
