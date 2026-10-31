@@ -1,6 +1,8 @@
 package com.vortex663.mt5tradecalculator;
 
-import android.app.Activity;
+import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import android.os.Bundle;
 import android.graphics.Color;
 import android.view.View;
@@ -9,7 +11,7 @@ import android.net.Uri;
 import android.widget.*;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     EditText entry, sl, balance, risk, point, tickSize, tickValue, volumeStep, symbol;
     RadioGroup side;
     Spinner instrumentType;
@@ -17,23 +19,23 @@ public class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle b) {
         super.onCreate(b);
-        getWindow().setStatusBarColor(Color.rgb(15,18,25));
-        getWindow().setNavigationBarColor(Color.rgb(15,18,25));
+        getWindow().setStatusBarColor(Color.rgb(20,18,24));
+        getWindow().setNavigationBarColor(Color.rgb(20,18,24));
         ScrollView scroll = new ScrollView(this);
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(20), dp(22), dp(20), dp(28));
-        root.setBackgroundColor(Color.rgb(15,18,25));
+        root.setBackgroundColor(Color.rgb(20,18,24));
         scroll.addView(root);
         setContentView(scroll);
 
         TextView title = new TextView(this);
         title.setText("MT5 Trade Calculator");
-        title.setTextColor(Color.WHITE); title.setTextSize(24); title.setTypeface(null, 1);
+        title.setTextColor(Color.rgb(240,225,255)); title.setTextSize(30); title.setTypeface(null, 1);
         root.addView(title);
         TextView subtitle = new TextView(this);
         subtitle.setText("Offline calculator • Fixed risk : reward 1 : 3");
-        subtitle.setTextColor(Color.LTGRAY); subtitle.setTextSize(13);
+        subtitle.setTextColor(Color.rgb(205,190,220)); subtitle.setTextSize(14);
         subtitle.setPadding(0, dp(5), 0, dp(18)); root.addView(subtitle);
 
         addLabel(root, "Instrument type");
@@ -44,8 +46,8 @@ public class MainActivity extends Activity {
         instrumentType.setAdapter(adapter); root.addView(instrumentType, params(-1,dp(48),0,0,0,2));
         symbol = addField(root, "Exact broker symbol", "e.g. XAUUSD, EURUSD, US30.cash");
 
-        Button search = new Button(this);
-        search.setText("SEARCH WEB FOR SYMBOL SPECS");
+        MaterialButton search = new MaterialButton(this);
+        search.setText("SEARCH WEB FOR SYMBOL SPECS"); search.setCornerRadius(dp(24)); search.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(75,55,105)));
         root.addView(search, params(-1,-2,0,8,0,10));
         search.setOnClickListener(v -> searchSpecs());
 
@@ -66,16 +68,16 @@ public class MainActivity extends Activity {
         tickValue = addField(root, "Tick value per 1.0 lot (account currency)", "e.g. 1.00");
         volumeStep = addField(root, "Volume step", "e.g. 0.01");
 
-        Button calc = new Button(this); calc.setText("CALCULATE");
+        MaterialButton calc = new MaterialButton(this); calc.setText("CALCULATE"); calc.setCornerRadius(dp(28)); calc.setTextSize(16); calc.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
         root.addView(calc, params(-1,-2,0,8,0,14));
         output = new TextView(this); output.setTextColor(Color.WHITE); output.setTextSize(16);
-        output.setPadding(dp(14),dp(16),dp(14),dp(16)); output.setBackgroundColor(Color.rgb(31,38,50));
+        output.setPadding(dp(18),dp(20),dp(18),dp(20)); output.setBackgroundColor(Color.rgb(48,40,58)); output.setTextColor(Color.rgb(245,235,255));
         root.addView(output, params(-1,-2,0,12,0,0));
         calc.setOnClickListener(v -> calculate());
 
         TextView note = new TextView(this);
         note.setText("Web search opens results in your browser; it does not automatically import values. Tick value, tick size and volume rules are broker- and account-specific. Confirm the exact symbol in MT5 before relying on a calculation.");
-        note.setTextColor(Color.LTGRAY); note.setTextSize(12); note.setPadding(0,dp(16),0,0); root.addView(note);
+        note.setTextColor(Color.rgb(190,180,200)); note.setTextSize(12); note.setPadding(0,dp(16),0,0); root.addView(note);
     }
 
     void searchSpecs() {
@@ -94,18 +96,18 @@ public class MainActivity extends Activity {
         p.setMargins(l==0?0:dp(l),dp(t),r==0?0:dp(r),dp(b)); return p;
     }
     void addLabel(LinearLayout root, String text) {
-        TextView tv = new TextView(this); tv.setText(text); tv.setTextColor(Color.rgb(150,190,255));
+        TextView tv = new TextView(this); tv.setText(text); tv.setTextColor(Color.rgb(220,190,255));
         tv.setTextSize(14); tv.setTypeface(null,1); tv.setPadding(0,dp(12),0,dp(5)); root.addView(tv);
     }
     EditText addField(LinearLayout root, String label, String hint) {
         addLabel(root,label);
         EditText e = new EditText(this); e.setSingleLine(true); e.setTextColor(Color.WHITE);
-        e.setHintTextColor(Color.GRAY); e.setHint(hint); e.setTextSize(16);
+        e.setHintTextColor(Color.rgb(175,165,185)); e.setHint(hint); e.setTextSize(16);
         e.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         if (label.equals("Entry price") || label.contains("points") || label.contains("balance") || label.equals("Risk (%)") || label.contains("size") || label.contains("value") || label.contains("step")) {
             e.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
         }
-        e.setPadding(dp(12),dp(8),dp(12),dp(8)); e.setBackgroundColor(Color.rgb(31,38,50));
+        e.setPadding(dp(14),dp(10),dp(14),dp(10)); e.setBackgroundColor(Color.rgb(42,36,50));
         root.addView(e, params(-1,dp(50),0,0,0,2)); return e;
     }
     double val(EditText e) { String s=e.getText().toString().trim(); if(s.isEmpty()) throw new IllegalArgumentException("Fill in every field."); return Double.parseDouble(s); }
